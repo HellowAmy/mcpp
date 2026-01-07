@@ -1,4 +1,4 @@
-# C++入门编程代码规范
+# 我的C++规范 - MC++
 
 
 在无编程经验初学者的视角，编写C++11为基础的入门教程案例，重点讲述代码在 **编程规范** 方面的内容，让初学者结合AI的反馈编写程序
@@ -41,7 +41,7 @@ cmake_minimum_required(VERSION 3.20)
 ~~~
 
 #### 一键启动
-可以使用VSCode一键运行，存在tasks.json和launch.json文件，如果文件未更新，请在bash目录下执行脚本更新配置文件，随后在VSCode中可见
+可以使用VSCode一键运行，存在tasks.json和launch.json文件，如果文件未更新，请在bash目录下执行脚本更新配置文件，随后在 VSCode "运行和调试" 中出现运行选项
 
 ~~~
 python3 update_launch.py
