@@ -1,0 +1,41 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "run #INDEX#",
+            "type": "shell",
+            "command": "cmake -S .. -B build -DDIR#INDEX#=ON && cmake --build build",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}/example/#INDEX#"
+            }
+        },
+        {
+            "label": "run 01",
+            "type": "shell",
+            "command": "cmake -S .. -B build -DDIR01=ON && cmake --build build",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}/example/01"
+            }
+        },
+        {
+            "label": "run 02",
+            "type": "shell",
+            "command": "cmake -S .. -B build -DDIR02=ON && cmake --build build",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}/example/02"
+            }
+        },
+        {
+            "label": "run 03",
+            "type": "shell",
+            "command": "cmake -S .. -B build -DDIR03=ON && cmake --build build",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}/example/03"
+            }
+        }
+    ]
+}

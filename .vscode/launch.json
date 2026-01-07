@@ -1,0 +1,105 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "#INDEX#",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/example/#INDEX#/build/mcpp",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/example/#INDEX#/build/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Pretty printing",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Disassembly flavor Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "run #INDEX#"
+        },
+        {
+            "name": "01",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/example/01/build/mcpp",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/example/01/build/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Pretty printing",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Disassembly flavor Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "run 01"
+        },
+        {
+            "name": "02",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/example/02/build/mcpp",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/example/02/build/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Pretty printing",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Disassembly flavor Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "run 02"
+        },
+        {
+            "name": "03",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/example/03/build/mcpp",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/example/03/build/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Pretty printing",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Disassembly flavor Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "run 03"
+        }
+    ]
+}
