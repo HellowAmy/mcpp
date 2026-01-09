@@ -12,23 +12,34 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE "Debug")
 
 # 设置源文件
+###
+# if(ALL OR DIR#INDEX#)
+#     set(SRC_FILES
+#         #INDEX#/main.cpp
+#     )
+# endif()
+###
 if(ALL OR DIR01)
     set(SRC_FILES
         01/main.cpp
     )
 endif()
-
 if(ALL OR DIR02)
     set(SRC_FILES
         02/main.cpp
     )
 endif()
-
 if(ALL OR DIR03)
     set(SRC_FILES
         03/main.cpp
     )
 endif()
+if(ALL OR DIR04)
+    set(SRC_FILES
+        04/main.cpp
+    )
+endif()
+###
 
 # 包含头文件目录
 include_directories(${CMAKE_SOURCE_DIR}/common)
