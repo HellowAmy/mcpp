@@ -45,6 +45,15 @@
             "options": {
                 "cwd": "${workspaceFolder}/example/04"
             }
+        },
+        {
+            "label": "run 05",
+            "type": "shell",
+            "command": "cmake -S .. -B build -DDIR05=ON && cmake --build build",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}/example/05"
+            }
         }
     ]
 }

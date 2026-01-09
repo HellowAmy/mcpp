@@ -39,7 +39,17 @@ if(ALL OR DIR04)
         04/main.cpp
     )
 endif()
+if(ALL OR DIR05)
+    set(SRC_FILES
+        05/main.cpp
+    )
+endif()
 ###
+
+# 添加新增源文件
+list(APPEND SRC_FILES
+    src/byte.cpp
+)
 
 # 包含头文件目录
 include_directories(${CMAKE_SOURCE_DIR}/common)
