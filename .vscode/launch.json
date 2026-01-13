@@ -200,6 +200,31 @@
                 }
             ],
             "preLaunchTask": "run 07"
+        },
+        {
+            "name": "08",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/example/08/build/mcpp",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/example/08/build/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Pretty printing",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Disassembly flavor Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "run 08"
         }
     ]
 }

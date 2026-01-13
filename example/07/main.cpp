@@ -206,7 +206,7 @@ int game_exp()
     return _input_back_;
 }
 
-// 入门函数
+// 入口函数
 int main(int argc, char **argv)
 {
     // 显示游戏菜单
