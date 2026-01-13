@@ -28,10 +28,9 @@ def make_md_links(ls_lines):
     ls_links = []
     for filename in ls_lines:
         path = Path(filename)
-        path.name
-        link = f"[{path.stem}](./doc/{path.name})  \n"
-        ls_links.append(link)
-        print(link)
+        if path.name != "模板.md":
+            link = f"[{path.stem}](./doc/{path.name})  \n"
+            ls_links.append(link)
     return ls_links
 
 
@@ -59,6 +58,7 @@ if __name__ == "__main__":
         ls_names.sort()
         ls_names.append("  \n")
         ls_lines[ibegin + 1 : iend] = ls_names
+        print("\n".join(ls_names))
 
         # 写入文件
         with open(file_path, "w", encoding="utf-8") as f:
