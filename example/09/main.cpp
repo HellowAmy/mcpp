@@ -11,6 +11,10 @@ public:
     // 默认无参数构造函数
     animal() {}
 
+    // 析构函数
+    // 因为类中存在虚函数必须要指定析构函数为虚函数
+    virtual ~animal() {}
+
     // 有参数默构造函数，主要用于给数据赋值
     animal(bool male, size_t age)
         : _male(male), _age(age) {}
@@ -66,8 +70,8 @@ public:
     rabbit(bool male, size_t age, std::string name)
         : animal(male, age), _name(name) {}
 
-    // 纯虚函数，需要子类实现
-    virtual std::string action() = 0;
+    // 指定析构为虚函数
+    virtual ~rabbit() {}
 
     // 实现父类的纯虚函数
     // 表明自己的类型是兔子
@@ -93,6 +97,10 @@ public:
     }
 
 protected:
+    // 纯虚函数，需要子类实现，而且不能被外部直接调用
+    virtual std::string action() = 0;
+
+protected:
     std::string _name;
 };
 
@@ -101,6 +109,10 @@ class fox : public animal
 {
 public:
     using animal::animal;
+
+    // 指定析构为虚函数
+    virtual ~fox() {}
+
     std::string kind() override
     {
         return "FOX";
@@ -126,6 +138,7 @@ public:
     JudyHopps(int age)
         : rabbit(false, age, "朱迪") {}
 
+protected:
     // 实现虚函数功能
     // 指定不同年龄干不一样的事情
     std::string action() override
@@ -149,6 +162,7 @@ public:
     BonnieHopps()
         : rabbit(false, 55, "朱迪妈妈") {}
 
+protected:
     std::string action() override
     {
         return "和朱迪的爸爸在家种胡萝卜";
@@ -202,7 +216,7 @@ std::string animal_info(animal *actor)
 // show 函数是虚函数，这里会调用子类的 show 函数
 void showtime_fox(fox *actor)
 {
-    std::string str = "{0}\n少废话，请开始你的表演\n{1}";
+    std::string str = "{0}\n少废话，请开始你的表演\n{1}\n";
     replace_str_ref(str, "{0}", animal_info(actor));
     replace_str_ref(str, "{1}", actor->show());
     std::cout << str << std::endl;
@@ -218,6 +232,12 @@ void showtime_rabbit(rabbit *actor)
     replace_str_ref(str, "{1}", actor->get_name());
     replace_str_ref(str, "{2}", actor->introduce());
     std::cout << str << std::endl;
+}
+
+// 显示动物虚函数
+void show_animal_kind(animal *actor)
+{
+    MCLOG($(actor->kind()));
 }
 
 int main(int argc, char **argv)
@@ -245,6 +265,12 @@ int main(int argc, char **argv)
     MCLOG("野生的狐狸");
     fox nono = fox(true, 4);
     showtime_fox(&nono);
+
+    MCLOG("动物虚函数");
+    JudyHopps judy_kind = JudyHopps();
+    NickWilde nick_kind = NickWilde();
+    show_animal_kind(&judy_kind);
+    show_animal_kind(&nick_kind);
 
     return 0;
 }
