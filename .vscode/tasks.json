@@ -90,6 +90,15 @@
             "options": {
                 "cwd": "${workspaceFolder}/example/09"
             }
+        },
+        {
+            "label": "run 10",
+            "type": "shell",
+            "command": "cmake -S .. -B build -DDIR10=ON && cmake --build build",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}/example/10"
+            }
         }
     ]
 }
