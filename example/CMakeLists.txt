@@ -79,6 +79,11 @@ if(ALL OR DIR12)
         12/main.cpp
     )
 endif()
+if(ALL OR DIR13)
+    set(SRC_FILES
+        13/main.cpp
+    )
+endif()
 ###
 
 # 添加新增源文件
