@@ -84,12 +84,18 @@ if(ALL OR DIR13)
         13/main.cpp
     )
 endif()
+if(ALL OR DIR14)
+    set(SRC_FILES
+        14/main.cpp
+    )
+endif()
 ###
 
 # 添加新增源文件
 list(APPEND SRC_FILES
     src/byte.cpp
     src/format.cpp
+    src/rand_int.cpp
 )
 
 # 包含头文件目录
