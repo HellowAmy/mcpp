@@ -153,6 +153,15 @@
             "options": {
                 "cwd": "${workspaceFolder}/example/16"
             }
+        },
+        {
+            "label": "run 17",
+            "type": "shell",
+            "command": "cmake -S .. -B build -DDIR17=ON && cmake --build build",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}/example/17"
+            }
         }
     ]
 }
