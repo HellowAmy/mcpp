@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <random>
 #include <memory>
+#include <functional>
+#include <atomic>
 
 #include "mclog.h"
 #include "rand_int.h"
@@ -48,6 +50,7 @@ public:
     // 处理输入字符
     input_ctx get_input()
     {
+        // 接收输入，直到符合需求后退出
         input_ctx ret;
         std::string buff;
         while (true)
@@ -122,6 +125,11 @@ public:
     // 开始游戏接口
     input_ctx start_game()
     {
+        // 记录游戏开始
+        using namespace std::chrono;
+        _game_time = 0;
+        auto begin_time = steady_clock::now();
+
         // 获取子类提供的数据，打印提示后开始
         data d = get_data();
         print_describe(d);
@@ -155,6 +163,7 @@ public:
             d.residue -= std::abs(diff);
             update_status(d, false);
 
+            // 显示计算后余量
             std::string str = "residue: {} = {} - {} >> {} = {} - |{}|\n";
             str = replace_fix(str)(diff, d.total, sum, d.residue, cur_residue, diff);
             std::cout << str << std::endl;
@@ -164,8 +173,34 @@ public:
         // input_ctx() 默认状态是游戏正在进行
         update_status(d, true);
         print_game_over(d);
+
+        // 计算游戏时间，并记录最快时间
+        auto end_time = steady_clock::now();
+        _game_time = duration_cast<seconds>(end_time - begin_time).count();
+        if (_fast_game_time == 0 || _game_time < _fast_game_time)
+        {
+            if (d.status == en_mode_game::e_win)
+            {
+                _fast_game_time = _game_time;
+            }
+        }
         return input_ctx();
     }
+
+    // 获取完成游戏的时间
+    size_t finish_game_time_sec()
+    {
+        return _game_time;
+    }
+
+    // 最快通过时间
+    size_t fast_game_time_sec()
+    {
+        return _fast_game_time;
+    }
+
+    // 游戏名称
+    virtual std::string game_name() = 0;
 
 protected:
     // 不同游戏进入时的首次描述
@@ -223,6 +258,10 @@ private:
 private:
     // 用户输入管理，用于统一处理输入状态
     recv_input _input;
+
+    // 记录通过时间和最快通过时间
+    size_t _game_time = 0;
+    size_t _fast_game_time = 0;
 };
 
 // 乘法运算
@@ -244,8 +283,8 @@ protected:
     void print_tips(int count, int num, const data &d) override
     {
         std::string str = "当前为 {} 次，余量为 residue = {} \n"
-                          "公式 sum = a * b ，本次 a = {}，请输入 b = ";
-        str = replace_fix(str)(count + 1, d.residue, num);
+                          "公式 {} = {} * b ，请输入 b = ";
+        str = replace_fix(str)(count + 1, d.residue, d.total, num);
         std::cout << str << std::endl;
     }
     int calc_rule(int a, int b) override
@@ -264,11 +303,15 @@ protected:
 
         // 提供随机数为计算元素，让玩家更难计算
         rand_int rand(2, 40);
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 3; i++)
         {
             d.rule_num.push_back(rand.value());
         }
         return d;
+    }
+    std::string game_name() override
+    {
+        return "乘法计算";
     }
 };
 
@@ -289,8 +332,8 @@ protected:
     void print_tips(int count, int num, const data &d) override
     {
         std::string str = "当前为 {} 次，余量为 residue = {} \n"
-                          "公式 sum = a ^ b ，本次 a = {}，请输入 b = ";
-        str = replace_fix(str)(count + 1, d.residue, num);
+                          "公式 {} = {} ^ b ，请输入 b = ";
+        str = replace_fix(str)(count + 1, d.residue, d.total, num);
         std::cout << str << std::endl;
     }
     int calc_rule(int a, int b) override
@@ -305,7 +348,7 @@ protected:
     {
         data d;
         d.total = 1000;
-        d.residue = 400;
+        d.residue = 500;
 
         rand_int rand(3, 7);
         for (int i = 0; i < 3; i++)
@@ -314,20 +357,47 @@ protected:
         }
         return d;
     }
+    std::string game_name() override
+    {
+        return "指数计算";
+    }
 };
 
 // 最速公式游戏启动接口
 class fast_game
 {
 public:
-    // 存放游戏描述和启动游戏的指针，使用智能指针管理内存
-    struct game_desc
+    fast_game()
     {
-        std::string desc;
-        std::shared_ptr<game_flow> game;
-    };
+        // 使用 shared_ptr 智能指针管理线程，这里提供了创建和销毁方式
+        // new std::thread(&fast_game::work_countdown_th, this) 创建一个线程并运行
+        // th->join(); 回调是用于销毁线程
+        _th_countdown = std::shared_ptr<std::thread>(
+            new std::thread(&fast_game::work_countdown_th, this),
+            [](std::thread *th)
+            { th->join(); });
+    }
 
-public:
+    // 倒计时线程
+    void work_countdown_th()
+    {
+        _countdown = -1;
+        while (_run)
+        {
+            // 写入倒计时内容，使用 flush 函数刷新缓冲区
+            if (_countdown >= 0)
+            {
+                std::cout << "\033[s";
+                std::cout << "\033[3A";
+                std::cout << "\r" << "countdown: " << _countdown;
+                std::cout << "\033[u";
+                std::flush(std::cout);
+                _countdown++;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
+
     // 启动入口
     void run()
     {
@@ -344,7 +414,21 @@ public:
                 game_flow *game = game_type(input.value);
                 if (game)
                 {
+                    start_game();
                     input = game->start_game();
+                    end_end();
+
+                    // 打印游戏时间
+                    size_t sec = game->finish_game_time_sec();
+                    if (sec > 0)
+                    {
+                        int fast_time = game->fast_game_time_sec();
+
+                        std::string str = "本次游戏时间为: {}秒\n"
+                                          "最快记录为: {}秒\n";
+                        str = replace_fix(str)(sec, fast_time);
+                        std::cout << str << std::endl;
+                    }
                 }
             }
 
@@ -352,13 +436,13 @@ public:
             if (_input.is_quit(input))
             {
                 print_quit();
-                break;
+                _run = false;
             }
         }
     }
 
     // 安装游戏类型
-    void install_game(const game_desc &game)
+    void install_game(std::shared_ptr<game_flow> game)
     {
         _mp_game[_mp_game.size() + 1] = game;
     }
@@ -370,7 +454,7 @@ private:
         std::string opt;
         for (auto &a : _mp_game)
         {
-            opt += replace_fix("{}.{} \n")(a.first, a.second.desc);
+            opt += replace_fix("{}.{} \n")(a.first, a.second->game_name());
         }
         std::string str = "\n欢迎来到最速公式，可选择以下游戏\n{}";
         str = replace_fix(str)(opt);
@@ -389,9 +473,21 @@ private:
         auto it = _mp_game.find(index);
         if (it != _mp_game.end())
         {
-            return it->second.game.get();
+            return it->second.get();
         }
         return nullptr;
+    }
+
+    // 开始游戏时初始化参数
+    void start_game()
+    {
+        _countdown = 0;
+    }
+
+    // 结束游戏时回收
+    void end_end()
+    {
+        _countdown = -1;
     }
 
 private:
@@ -399,27 +495,24 @@ private:
     recv_input _input;
 
     // 使用 map 容器可以动态的扩展选项
-    std::map<int, game_desc> _mp_game;
+    // 存放启动游戏的指针，使用智能指针管理内存
+    std::map<int, std::shared_ptr<game_flow>> _mp_game;
+
+    // 原子变量，保证多线程修改数据准确
+    std::atomic<int> _countdown;
+
+    // 倒计时线程，在构造函数中初始化
+    std::shared_ptr<std::thread> _th_countdown = nullptr;
 };
 
 int main(int argc, char **argv)
 {
     fast_game game;
 
-    {
-        // 动态添加游戏
-        // 智能指针管理权会将转移到 fast_game 中的 map 容器中
-        fast_game::game_desc d;
-        d.desc = "乘法游戏";
-        d.game = std::make_shared<game_mul>();
-        game.install_game(d);
-    }
-    {
-        fast_game::game_desc d;
-        d.desc = "指数游戏";
-        d.game = std::make_shared<game_exp>();
-        game.install_game(d);
-    }
+    // 动态添加游戏
+    // 智能指针管理权会将转移到 fast_game 中的 map 容器中
+    game.install_game(std::make_shared<game_mul>());
+    game.install_game(std::make_shared<game_exp>());
 
     game.run();
 
