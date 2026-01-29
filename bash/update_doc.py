@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+import re
 
 
 # 读取文件
@@ -55,7 +56,7 @@ if __name__ == "__main__":
 
         # 获取文档名
         ls_names = make_md_links(os.listdir(path_doc))
-        ls_names.sort()
+        ls_names.sort(key=lambda x: int(re.search(r"\d+", x).group()))
         ls_names.append("  \n")
         ls_lines[ibegin + 1 : iend] = ls_names
         print("\n".join(ls_names))
