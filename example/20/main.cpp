@@ -85,16 +85,21 @@ public:
         // 一个采集机器
         auto fn_collect = std::bind(&factory_eggs::work_collect_eggs, this);
         auto sp_collect_1 = std::shared_ptr<std::thread>(new std::thread(fn_collect), fn_delete);
+        auto sp_collect_2 = std::shared_ptr<std::thread>(new std::thread(fn_collect), fn_delete);
 
         _works.push_back(sp_package_1);
         _works.push_back(sp_package_2);
         _works.push_back(sp_package_3);
         _works.push_back(sp_collect_1);
+        _works.push_back(sp_collect_2);
     }
 
     ~factory_eggs()
     {
+        // 关闭运行，线程准备退出
         _run = false;
+
+        // 通知所有线程启动，准备退出
         _cond.notify_all();
         MCLOG("退出鸡蛋工厂 " $(_que.size()));
     }
@@ -120,6 +125,7 @@ private:
                 std::unique_lock<std::mutex> lock(_mut);
                 while (_que.is_empty() && _run)
                 {
+                    // 如果数据为空，线程休眠，等待鸡蛋收集
                     _cond.wait(lock);
                 }
                 _tag++;
@@ -175,8 +181,11 @@ private:
                 rand_int rand_id(0, 10000);
                 for (int i = 0; i < rand_size.value(); i++)
                 {
+                    // 存放数据
                     _que.push(rand_id.value());
                 }
+
+                // 通知一个线程启动
                 _cond.notify_one();
             }
         }
@@ -217,6 +226,7 @@ int main(int argc, char **argv)
 
         // 打印发货后鸡蛋信息
         factory.register_transport([](info_eggs ct) {
+            // 这里是回调函数，在鸡蛋工厂的子线程内执行
             std::string str = "tag: {} size: {} data: {}\n{}";
             std::string str_id;
             for (int i = 0; i < ct.id.size(); i++)
@@ -227,7 +237,7 @@ int main(int argc, char **argv)
             // MCLOG($(str));
         });
 
-        // 3秒后自动关闭
+        // 主线程挂机等待，3秒后自动关闭
         MCLOG("等待工厂关闭")
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
@@ -235,21 +245,3 @@ int main(int argc, char **argv)
     MCLOG("退出程序")
     return 0;
 }
-
-/*
-进入发货流程 [/home/red/open/github/mcpp/example/20/main.cpp:112]
-进入发货流程 [/home/red/open/github/mcpp/example/20/main.cpp:112]
-进入发货流程 [/home/red/open/github/mcpp/example/20/main.cpp:112]
-进入采集流程 [/home/red/open/github/mcpp/example/20/main.cpp:169]
-等待工厂关闭 [/home/red/open/github/mcpp/example/20/main.cpp:231]
-退出采集流程 [_que.size(): 退出鸡蛋工厂 [_que.size(): 5006]  [/home/red/open/github/mcpp/example/20/main.cpp:183]5006
-]  [/home/red/open/github/mcpp/example/20/main.cpp:99]
-退出发货流程 [_que.size(): 0]  [/home/red/open/github/mcpp/example/20/main.cpp:163]
-退出发货流程 [_que.size(): 0]  [/home/red/open/github/mcpp/example/20/main.cpp:163]
-退出发货流程 [_que.size(): 0]  [/home/red/open/github/mcpp/example/20/main.cpp:163]
-线程退出 [/home/red/open/github/mcpp/example/20/main.cpp:76]
-线程退出 [/home/red/open/github/mcpp/example/20/main.cpp:76]
-线程退出 [/home/red/open/github/mcpp/example/20/main.cpp:76]
-线程退出 [/home/red/open/github/mcpp/example/20/main.cpp:76]
-退出程序 [/home/red/open/github/mcpp/example/20/main.cpp:235]
-*/
